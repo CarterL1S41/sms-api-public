@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+
+
+
+    <head>
+        <link rel="stylesheet" href="../global.css">
+        <link rel="stylesheet" href="../create.css">
+    </head>
+
+
+
+    <body>
+        <div class="container">
+            <hr>
+            <h1>Create a new account</h1>
+            <a href="/">Back</a>
+            <hr>
+            <form action="http://localhost:3000/accountcreate" method="POST">
+                <div class="form-group">
+                    <label for="Username">Username</label>
+                    <input class="form-control" name="username" required="true">
+                </div>
+                <div class="form-group">
+                    <label for="Password">Password</label>
+                    <input class="form-control" name="password" type="password" required="true">
+                </div>
+                <button type="submit" class="btn btn-primary">Create</button>
+            </form>
+        </div>
+    </body>
+
+
+
+</html>

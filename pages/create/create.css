@@ -1,0 +1,55 @@
+
+
+
+* {
+    transition: all 0.5s ease;
+}
+
+h1 {
+    text-align: center;
+    color: rgb(0, 50, 0)
+}
+
+h2 {
+    text-align: center;
+    color: rgb(0, 50, 0)
+}
+
+a:link, a:visited {
+    text-align: center;
+    color: rgb(0, 50, 0);
+    background-color: rgb(0, 150, 0);
+    padding: 14px 25px;
+    display: block;
+    border: 2px solid rgb(0, 50, 0);
+    width: 250px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+button {
+    text-align: center;
+    color: rgb(0, 50, 0);
+    background-color: rgb(0, 150, 0);
+    padding: 14px 25px;
+    display: block;
+    border: 2px solid rgb(0, 50, 0);
+    width: 250px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+div.form-group {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+

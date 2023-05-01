@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+
+
+
+    <head>
+        <link rel="stylesheet" href="../global.css">
+        <link rel="stylesheet" href="../settings.css">
+    </head>
+
+
+
+    <body>
+
+        <div class="wrapper">
+
+            <div class="sidebar">
+                
+                <a href="/settings">
+                        
+                    <img src="http://localhost:3000/pfpgrab" class="sidebaritem">
+
+                </a>
+
+                <a href="/main">
+
+                    <img src="http://localhost:3000/homelogo" class="sidebaritem">
+
+                </a>
+
+                <a href="/logout">
+
+                    <img src="http://localhost:3000/logoutlogo" class="sidebaritem" id="sidebaritem-bottom">
+
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="settings">
+
+            <div id="username"><a onclick="append()"><img src="http://localhost:3000/editusername" id="editusername" /></a></div>
+            
+            <img src="http://localhost:3000/pfpgrab" id="pfplogo">
+
+            <script>
+                async function url() {
+                    const response = fetch('http://localhost:3000/usernamefetch')
+                    return response
+                }
+                url().then((response) => response.json()).then((data) => {
+                    var mainContainer = document.getElementById('username')
+                    var div = document.createElement('usernameDIV')
+                    div.innerHTML = data.username
+                    mainContainer.appendChild(div)
+                })
+
+                async function append() {
+                    var div = document.createElement('div')
+                    div.id = 'editusernamediv'
+                    div.innerHTML = `
+                    <h1>Edit your Username</h1>
+                    <form action="" id="loginformaction">
+                        <div class="form-group">
+                            <label for="Username">Username</label>
+                            <input class="form-control" name="username" required="true" id="usernameInput">
+                        </div>
+                        <div class="form-group">
+                            <label for="Password">Password</label>
+                            <input class="form-control" name="password" type="password" required="true" id="passwordInput">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update</button>
+                    </form>
+                    <div id="usernameChangeError"></div>
+                    `
+                    document.body.appendChild(div)
+
+                    const usernameChangeForm = document.getElementById('loginformaction')
+
+                    usernameChangeForm.addEventListener("submit", (e) => {
+                        e.preventDefault();
+                        async function usernameChange(){
+                            let input1 = document.getElementById('usernameInput')
+                            let input2 = document.getElementById('passwordInput')
+                            let stringify = {
+                                newUsername: input1.value,
+                                password: input2.value
+                            }
+                            const response = await fetch('http://localhost:3000/accountusernameupdate', {
+                                body: JSON.stringify(stringify),
+                                method: 'POST'
+                            })
+                            return response
+                        }
+                        usernameChange().then((response) => response.json()).then((data) => {
+                            let state = data.response
+                            if(state==='200'){
+                                var div = document.getElementById('editusernamediv')
+                                div.remove()
+                            }
+                            if(state==='300'){
+                                var div = document.getElementById('usernameChangeError')
+                                const newDiv = document.createElement('div')
+                                newDiv.innerHTML = 'Username is taken'
+                                div.appendChild(newDiv)
+                            }
+                            if(state==='301'){
+                                var div = document.getElementById('usernameChangeError')
+                                const newDiv = document.createElement('div')
+                                newDiv.innerHTML = 'Incorrect password'
+                                div.appendChild(newDiv)
+                            }
+                        })
+                    })
+                }
+            </script>
+
+        </div>
+
+    </body>
+
+
+
+</html>

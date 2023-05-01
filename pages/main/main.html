@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+
+
+
+    <head>
+        <link rel="stylesheet" href="../global.css">
+        <link rel="stylesheet" href="../main.css">
+    </head>
+
+
+
+    <body>
+
+        <div class="wrapper">
+
+            <div class="sidebar">
+                
+                <a href="/settings">
+                        
+                    <img src="http://localhost:3000/pfpgrab" class="sidebaritem">
+
+                </a>
+
+                <a href="/main">
+
+                    <img src="http://localhost:3000/homelogo" class="sidebaritem">
+
+                </a>
+
+                <a href="/logout">
+
+                    <img src="http://localhost:3000/logoutlogo" class="sidebaritem" id="sidebaritem-bottom">
+
+                </a>
+
+            </div>
+
+        </div>
+
+        <div class="messagesbox" id="messagesbox">
+            
+            <div class="chatcreate"><a onclick="chatcreate()"><img src="http://localhost:3000/chatcreatelogo" id="chatcreatelogo"/></a></div>
+
+            <script>
+
+                async function chatcreate(){
+                    var div = document.createElement('div')
+                    div.id = 'chatcreatediv'
+                    div.innerHTML = `
+                    <h1>Create a chat</h1>
+                    <label for="Username">Username</label>
+                    <form action="" id="loginformaction">
+                        <div class="form-group">
+                            <input class="form-control" name="username" required="true" id="usernameInput">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create Chat</button>
+                    </form>
+                    <p1>You must refresh the page after creating chats for them to appear</p1>
+                    <div id="chatcreateerror"></div>
+                    `
+                    document.body.appendChild(div)
+
+                    const usernameChangeForm = document.getElementById('loginformaction')
+
+                    usernameChangeForm.addEventListener("submit", (e) => {
+                        e.preventDefault();
+                        async function usernameChange(){
+                            let input1 = document.getElementById('usernameInput')
+                            let stringify = {
+                                seconduser: input1.value
+                            }
+                            const response = await fetch('http://localhost:3000/chatcreate', {
+                                body: JSON.stringify(stringify),
+                                headers: {'Content-Type': 'application/json'},
+                                method: 'POST'
+                            })
+                            return response
+                        }
+                        usernameChange().then((response) => response.json()).then((data) => {
+                            let state = data.response
+                            if(state==='200'){
+                                var div = document.getElementById('chatcreatediv')
+                                div.remove()
+                            }
+                            if(state==='300'){
+                                var div = document.getElementById('chatcreateerror')
+                                const newDiv = document.createElement('div')
+                                newDiv.innerHTML = 'Account does not exist'
+                                div.appendChild(newDiv)
+                            }
+                        })
+                    })
+                }
+
+                var messageStore = []
+
+                async function fetchMessages(){
+                    const response = await fetch('http://localhost:3000/chatfetch')
+                    return response
+                }
+
+                async function fetchPFP(stringify){
+                    const jsonBody = JSON.stringify(stringify)
+                    const response = await fetch('http://localhost:3000/chatpfpfetch', {
+                        body: jsonBody,
+                        headers: {'Content-Type': 'application/json'},
+                        method: 'POST'
+                    })
+                    return response
+                }
+
+                async function fetchPFPexecute(element, div, divAdd){
+                    let stringify = {
+                        username: element
+                    }
+                    fetchPFP(stringify).then((response) => response.json()).then((data) => {
+                        const input = JSON.parse(element)
+                        divAdd.innerHTML = input.name
+                        divAdd.className = `${input.id}`
+                        div.appendChild(divAdd)
+                        divAdd.addEventListener("click", (e) => {
+                            chatFetch(e.srcElement.className)
+                        })
+                    })
+                }
+
+                fetchMessages().then((response) => response.json()).then((data) => {
+                    var div = document.getElementById('messagesbox')
+                    data.forEach(async (element) => {
+                        let divAdd = document.createElement('div')
+                        divAdd.id = 'chatuser'
+                        fetchPFPexecute(element, div, divAdd)
+                    })
+                })
+
+                async function chatFetch(id){
+                    async function fetchChatCore(stringify){
+                        const jsonBody = JSON.stringify(stringify)
+                        const response = await fetch('http://localhost:3000/msgfetch', {
+                            body: jsonBody,
+                            headers: {'Content-Type': 'application/json'},
+                            method: 'POST'
+                        })
+                        return response
+                    }
+                    let stringify = {
+                        id: id
+                    }
+                    fetchChatCore(stringify).then((response) => response.json()).then((data) => {
+                        let messages = data.messages
+                        if(messageStore.length !== messages.length || messageStore === undefined){
+                            let div = document.getElementById('chatbox')
+                            div.remove()
+                            let divhold = document.getElementById('chatbox-hold')
+                            let divCreate = document.createElement('div')
+                            divCreate.className = 'chatbox'
+                            divCreate.id = 'chatbox'
+                            messageStore = messages
+                            messages.forEach(async (element) => {
+                                let newDiv = document.createElement('div')
+                                if(element.author === data.username){
+                                    newDiv.className = 'messageright'
+                                } else {
+                                    newDiv.className = 'messageleft'
+                                }
+                                var date = new Date(element.timestamp * 1000);
+                                let args = (`${date}`).split(' ')
+                                let dateFormatted = args[1]+' '+args[2]+' '+args[3]+' '+args[4]
+                                newDiv.innerHTML = `<h3>${element.author}</h3><h5>${dateFormatted}</h5><p1>\n${element.content}</p1>`
+                                divCreate.appendChild(newDiv)
+                            })
+                            divhold.appendChild(divCreate)
+                        }
+                        let textarea = document.getElementById('textarea')
+                        if(textarea.className!==id){
+                            textarea.remove()
+                            let newtextarea = document.createElement('textarea')
+                            newtextarea.id = 'textarea'
+                            newtextarea.className = id
+                            let udiv = document.getElementById('inputbox')
+                            udiv.appendChild(newtextarea)
+                        }
+                    })
+                }
+
+                setInterval(refresh, 1*1000)
+                async function refresh(){
+                    let refreshEle = document.getElementById('textarea').className
+                    if(refreshEle){
+                        chatFetch(refreshEle)
+                    }
+                }
+
+                async function sendMessage(message){
+                    let textarea = document.getElementById('textarea')
+                    let value = textarea.value
+                    let id = textarea.className
+                    async function fetchChatCore(stringify){
+                        const jsonBody = JSON.stringify(stringify)
+                        const response = await fetch('http://localhost:3000/msgsubmit', {
+                            body: jsonBody,
+                            headers: {'Content-Type': 'application/json'},
+                            method: 'POST'
+                        })
+                        return response
+                    }
+                    let stringify = {
+                        id: id,
+                        message: value
+                    }
+                    fetchChatCore(stringify).then((response) => response.json()).then(async (data) => {
+                        let textarea = document.getElementById('textarea')
+                        await textarea.remove()
+                        let newtextarea = document.createElement('textarea')
+                        newtextarea.id = 'textarea'
+                        newtextarea.className = data.id
+                        let udiv = document.getElementById('inputbox')
+                        udiv.appendChild(newtextarea)
+                    })
+                }
+                
+            </script>
+
+        </div>
+
+        <div id="chatbox-hold">
+
+            <div class="chatbox" id="chatbox">
+    
+            </div>
+
+            <div class="inputbox" id="inputbox">
+
+                <textarea id="textarea" disabled="true"></textarea><a onclick="sendMessage()"><img src="http://localhost:3000/sendbutton" id="sendbutton"></a>
+
+            </div>
+
+        </div>
+
+    </body>
+
+
+
+</html>
