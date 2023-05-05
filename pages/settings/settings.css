@@ -64,6 +64,10 @@
     padding: 10px 10px;
 }
 
+#updatePFP {
+    padding-left: 10px;
+}
+
 #username {
     color: white;
     font-size: xx-large;
@@ -79,6 +83,7 @@
 #editusername:hover {
     opacity: 50%;
     transition: .25s;
+    cursor: pointer;
 }
 
 #editusernamediv {

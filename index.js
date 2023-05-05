@@ -10,6 +10,10 @@ const port = 3000;
 const saltRounds = 10;
 const cookieExpiration = 1000*60*60*24*7 //7 Days
 const version = JSON.parse(fs.readFileSync(`${__dirname}/package.json`)).version
+const multer = require('multer')
+const path = require('path')
+const url = require('url');
+const querystring = require('querystring');
 
 //Configures CORS
 app.use(cors());
@@ -20,6 +24,17 @@ app.use(cookieParser());
 // Configuring body parser middleware
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, `${__dirname}/pfps/`)
+    },
+    filename: function (req, file, cb) {
+      cb(null, Date.now() + path.extname(file.originalname)) //Appending extension
+    }
+})
+
+const upload = multer({ storage: storage })
 
 
 
@@ -365,16 +380,15 @@ app.post('/chatcreate', (req, res) => {
 
 
 //Chat Profile Picture Grabber
-app.post('/chatpfpfetch', (req, res) => {
-    const body = req.body
-
-
-
-
-
-
-    
-    res.send('{}')
+app.get('/chatpfpfetch', (req, res) => {
+    let parseBody = req.query
+    if(fs.existsSync(`${__dirname}/pfps/${parseBody.name}.json`)){
+        let rawPath = fs.readFileSync(`${__dirname}/pfps/${parseBody.name}.json`)
+        let jsonPath = JSON.parse(rawPath)
+        res.sendFile(`${__dirname}/pfps/${jsonPath.pfp}`)
+    } else {
+        res.sendFile(`${__dirname}/icons/default.png`)
+    }
 })
 
 //Login
@@ -443,6 +457,23 @@ app.post('/accountusernameupdate', (req, res) => {
     const body = req.body
     console.log(body)
     res.send('{ "response": "300" }')
+})
+
+//Update Profile Picture
+app.post('/uploadpfp', upload.single('newpfp'), (req, res) => {
+    let body = req.body
+    let cookie = req.cookies.sessionID
+    if(cookie !== undefined){
+        if(fs.existsSync(`${__dirname}/sessions/${cookie}.json`)){
+            let rawData = fs.readFileSync(`${__dirname}/sessions/${cookie}.json`)
+            let jsonData = JSON.parse(rawData)
+            let username = jsonData.username
+            fs.writeFileSync(`${__dirname}/pfps/${username}.json`, `{ "pfp": "${req.file.filename}" }`)
+
+
+            res.redirect('/settings')
+        }
+    }
 })
 
 app.listen(port, () => console.log(`SMS-API V-${version} listening on port ${port}!`))

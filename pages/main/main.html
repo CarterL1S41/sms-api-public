@@ -100,28 +100,13 @@
                     return response
                 }
 
-                async function fetchPFP(stringify){
-                    const jsonBody = JSON.stringify(stringify)
-                    const response = await fetch('http://localhost:3000/chatpfpfetch', {
-                        body: jsonBody,
-                        headers: {'Content-Type': 'application/json'},
-                        method: 'POST'
-                    })
-                    return response
-                }
-
                 async function fetchPFPexecute(element, div, divAdd){
-                    let stringify = {
-                        username: element
-                    }
-                    fetchPFP(stringify).then((response) => response.json()).then((data) => {
-                        const input = JSON.parse(element)
-                        divAdd.innerHTML = input.name
-                        divAdd.className = `${input.id}`
-                        div.appendChild(divAdd)
-                        divAdd.addEventListener("click", (e) => {
-                            chatFetch(e.srcElement.className)
-                        })
+                    const input = JSON.parse(element)
+                    divAdd.innerHTML = `<img id="sidechatpfp" src="http://localhost:3000/chatpfpfetch?name=${input.name}" /><p1 id="chatusername">${input.name}</p1>`
+                    divAdd.className = `${input.id}`
+                    div.appendChild(divAdd)
+                    divAdd.addEventListener("click", (e) => {
+                        chatFetch(e.srcElement.className)
                     })
                 }
 

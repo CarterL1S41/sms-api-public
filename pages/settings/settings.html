@@ -42,7 +42,15 @@
 
             <div id="username"><a onclick="append()"><img src="http://localhost:3000/editusername" id="editusername" /></a></div>
             
-            <img src="http://localhost:3000/pfpgrab" id="pfplogo">
+            <img src="http://localhost:3000/pfpgrab" id="pfplogo"/>
+
+            <form id="updatePFP" method="POST" action="/uploadpfp" enctype="multipart/form-data">
+
+                <input type="file" name="newpfp" />
+
+                <button>Upload</button>
+              
+            </form>
 
             <script>
                 async function url() {

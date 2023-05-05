@@ -159,4 +159,18 @@ p1 {
     font-weight: lighter;
 }
 
+#sidechatpfp {
+    padding-top: 2px;
+    padding-left: 2px;
+    width: 34px;
+    height: 34px;
+}
+
+#chatusername {
+    font-size: x-large;
+    position: fixed;
+    padding-left: 5px;
+    padding-top: 5px;
+}
+
 
